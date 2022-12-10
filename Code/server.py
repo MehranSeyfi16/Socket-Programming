@@ -1,48 +1,45 @@
 import json
 import socket
-from _thread import *
+import threading
+import time
 
 host = "127.0.0.1"
 port = 8080
+#scores = {"playerA": 0, "playerB": 0, "playerC": 0}
+clientCount = 0
+
+with open('questions.json', 'r') as myFile:
+    questions = json.load(myFile)
+
+
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+
+
+
+    for i in range(len(questions)):
+        data = f'question{i+1} is: {questions[i]["question"]}\noptions are: {questions[i]["options"]}'
+        conn.sendall(str.encode(data))
+
+        ans = conn.recv(1024).decode('utf-8')
+        print(ans)
+        # print(conn.getpeername()[1])
+        # if ans == str(questions[i]["answer"]):
+        #     pass
+
+
+print('[STARTING] Server is starting...')
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clients = []
-
-
-def client_handler(connection):
-
-    while True:
-        # connection.send("Hello".encode())
-        for c in clients:
-            c.sendall("sajjad".encode())
-        data = connection.recv(1024).decode()
-        # connection.sendall("question".encode())  # send data to the client
-
-        if not data:
-            # if data is not received break
-            break
-        print("from connected user: " + str(data))
-
-        # server_q = input()
-        # connection.sendall(data)
-
-
-
-
-
-    connection.close()
-
-
 try:
     server_socket.bind((host, port))
 except socket.error as e:
     print(str(e))
 
-print(f'Server is listing on the port {port}...')
-server_socket.listen(2)
+server_socket.listen()
+print(f'[LISTENING] Server is listing on {host}:{port}')
 
 while True:
-
-    client, address = server_socket.accept()
-    clients.append(client)
-    print('Connected to: ' + address[0] + ':' + str(address[1]))
-    start_new_thread(client_handler, (client,))
+    conn, addr = server_socket.accept()
+    clientCount += 1
+    threading.Thread(target=handle_client, args=(conn, addr)).start()
+    print(f'[ACTIVE CONNECTIONS] {threading.active_count() - 1}')

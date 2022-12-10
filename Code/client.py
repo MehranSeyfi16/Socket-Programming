@@ -1,19 +1,19 @@
 import socket
 
-HOST = "127.0.0.1"
-PORT = 8080
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "127.0.0.1"
+port = 8080
 
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
-    client_socket.connect((HOST, PORT))
+    client_socket.connect((host, port))
 except socket.error as e:
     print(str(e))
 
-while True:
-    data = client_socket.recv(1024).decode()  # receive response
-    print(data)
-    data = ""
-    Input = input('Your message: ')
-    client_socket.send(str.encode(Input))
+print(f"[CONNECTED] Client connected to server at {host}:{port}")
 
-client_socket.close()
+connected = True
+while connected:
+    data = client_socket.recv(1024)
+    print(data.decode('utf-8'))
+    answer = input('write your answer: ')
+    client_socket.send(str.encode(answer))
