@@ -10,14 +10,10 @@ except socket.error as e:
     print(str(e))
 
 while True:
+    data = client_socket.recv(1024).decode()  # receive response
+    print(data)
+    data = ""
     Input = input('Your message: ')
     client_socket.send(str.encode(Input))
-
-
-    if Input == 'bye':
-        break
-    else:
-        data = client_socket.recv(1024).decode()  # receive response
-        print(data)
 
 client_socket.close()

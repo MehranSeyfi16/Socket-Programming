@@ -11,7 +11,9 @@ clients = []
 def client_handler(connection):
 
     while True:
-
+        # connection.send("Hello".encode())
+        for c in clients:
+            c.sendall("sajjad".encode())
         data = connection.recv(1024).decode()
         # connection.sendall("question".encode())  # send data to the client
 
@@ -19,12 +21,13 @@ def client_handler(connection):
             # if data is not received break
             break
         print("from connected user: " + str(data))
-        server_q = input()
-        # connection.sendall(data)
-        for c in clients:
-            c.sendall(server_q.encode())
 
-        # scape = input("press any bottom to continue")
+        # server_q = input()
+        # connection.sendall(data)
+
+
+
+
 
     connection.close()
 
@@ -40,7 +43,6 @@ server_socket.listen(2)
 while True:
 
     client, address = server_socket.accept()
+    clients.append(client)
     print('Connected to: ' + address[0] + ':' + str(address[1]))
     start_new_thread(client_handler, (client,))
-    clients.append(client)
-
