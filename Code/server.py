@@ -7,8 +7,9 @@ port = 8080
 # scores = {"playerA": 0, "playerB": 0, "playerC": 0}
 clientCount = 0
 CLIENTS = []
+scores = {}
 
-with open('questions.json', 'r') as myFile:
+with open('Data/questions.json', 'r', encoding='utf8') as myFile:
     questions = json.load(myFile)
 
 
@@ -20,10 +21,25 @@ def handle_client(conn, addr):
         conn.sendall(str.encode(data))
 
         ans = conn.recv(1024).decode('utf-8')
-        print(ans)
+        # print(ans[0:1])
+        # print(addr[1])
         # print(conn.getpeername()[1])
         # if ans == str(questions[i]["answer"]):
         #     pass
+
+
+        # print(int(ans[3:len(ans)]))
+        # print(questions[i]["answer"])
+
+        user_answer = ans[3:len(ans)]
+        user_name = ans[0:1]
+
+        if int(user_answer) == questions[i]["answer"]:
+            if user_name not in scores:
+                scores[user_name] = 0
+            scores[user_name] += 1
+
+    print(scores)
 
 
 print('[STARTING] Server is starting...')
