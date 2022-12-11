@@ -2,9 +2,9 @@ import socket
 
 host = "127.0.0.1"
 port = 8080
-
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
+    # client_socket.bind((host, 8081))
     client_socket.connect((host, port))
 except socket.error as e:
     print(str(e))
