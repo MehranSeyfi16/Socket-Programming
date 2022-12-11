@@ -1,6 +1,7 @@
 import json
 import socket
 import threading
+import time
 
 host = "127.0.0.1"
 port = 8080
@@ -17,11 +18,14 @@ def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
 
     for i in range(len(questions)):
+        time.sleep(5)
         data = f'question{i + 1} is: {questions[i]["question"]}\noptions are: {questions[i]["options"]}'
+
+        #TODO Broadcast
         conn.sendall(str.encode(data))
 
         ans = conn.recv(1024).decode('utf-8')
-        # print(ans[0:1])
+        print(ans[0:1])
         # print(addr[1])
         # print(conn.getpeername()[1])
         # if ans == str(questions[i]["answer"]):
