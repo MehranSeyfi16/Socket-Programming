@@ -18,11 +18,16 @@ def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
 
     for i in range(len(questions)):
-        time.sleep(5)
+
         data = f'question{i + 1} is: {questions[i]["question"]}\noptions are: {questions[i]["options"]}'
 
-        #TODO Broadcast
-        conn.sendall(str.encode(data))
+
+        # conn.sendall(str.encode(data))
+        broadcast(str.encode(data), conn)
+        time.sleep(5)
+
+        # for c in CLIENTS:
+        #     c[0].sendall(str.encode(data))
 
         ans = conn.recv(1024).decode('utf-8')
         print(ans[0:1])
@@ -30,7 +35,6 @@ def handle_client(conn, addr):
         # print(conn.getpeername()[1])
         # if ans == str(questions[i]["answer"]):
         #     pass
-
 
         # print(int(ans[3:len(ans)]))
         # print(questions[i]["answer"])
@@ -55,6 +59,22 @@ except socket.error as e:
 
 server_socket.listen()
 print(f'[LISTENING] Server is listing on {host}:{port}')
+
+
+def broadcast(message, connection):
+    for clients in CLIENTS:
+        try:
+            clients[0].sendall(message)
+        except:
+            clients[0].close()
+
+            # if the link is broken, we remove the client
+            remove(clients)
+
+
+def remove(connection):
+    CLIENTS.remove(connection)
+
 
 while True:
     conn, addr = server_socket.accept()
