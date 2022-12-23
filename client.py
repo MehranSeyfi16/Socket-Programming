@@ -1,25 +1,30 @@
-import json
 import socket
 import threading
 import time
 from tkinter import *
+import json
+# import server
 
+host = "127.0.0.1"
+port = 8080
+ADDRESS = (host, port)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# scores = server.scores
 
-class Client:
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def score_counter(i):
+    str = f"sry{i}"
+    i = i+1
+    return str
 
-    def __init__(self):
-        self.ip = "127.0.0.1"
-        self.port = 8080
+with open('./Data/questions.json', 'r', encoding="utf8") as myFile:
+    questions = json.load(myFile)
 
-    def start_client(self):
+try:
+    client_socket.connect((host, port))
+except socket.error as e:
+    print(str(e))
 
-        try:
-            self.client_socket.connect((self.ip, self.port))
-        except socket.error as e:
-            print(str(e))
-
-        print(f"[CONNECTED] Client connected to server at {self.ip}:{self.port}")
+print(f"[CONNECTED] Client connected to server at {host}:{port}")
 
 
 class GUI:
@@ -66,8 +71,11 @@ class GUI:
                          font="Helvetica 14 bold",
                          command=lambda: self.go_ahead(self.entryName.get()))
 
+
         self.go.place(relx=0.4,
                       rely=0.4)
+
+
         self.Window.mainloop()
 
     def go_ahead(self, name):
@@ -78,14 +86,13 @@ class GUI:
         threading.Thread(target=self.receive).start()
 
     def layout(self, name):
-        Client.client_socket.sendall(str.encode(name))
         self.name = name
         self.Window.deiconify()
         self.Window.title("Competition")
         self.Window.resizable(width=False,
                               height=False)
 
-        self.Window.configure(width=600,
+        self.Window.configure(width=470,
                               height=550,
                               bg="#092594")
 
@@ -106,7 +113,8 @@ class GUI:
                         relheight=0.012)
 
         self.textCons = Text(self.Window,
-
+                             width=20,
+                             height=2,
                              bg="#d3e8c5",
                              fg="#000000",
                              font="Helvetica 14",
@@ -145,20 +153,8 @@ class GUI:
 
         self.buttonMsg.place(relx=0.77,
                              rely=0.008,
-                             relheight=0.03,
+                             relheight=0.06,
                              relwidth=0.22)
-
-        self.buttonChat = Button(self.labelBottom,
-                                 text="Chat",
-                                 font="Helvetica 10 bold",
-                                 width=20,
-                                 bg="#ced6c3",
-                                 command=lambda: self.chat_room())
-
-        self.buttonChat.place(relx=0.77,
-                              rely=0.040,
-                              relheight=0.03,
-                              relwidth=0.22)
 
         self.textCons.config(cursor="heart")
 
@@ -171,43 +167,39 @@ class GUI:
 
         self.textCons.config(state=DISABLED)
 
+        self.listBox = Listbox()
+
+        self.listBox.place(relwidth=0.4,
+                           relheight=0.12,
+                           relx=0.35,
+                           rely=0.2)
+
+
+        # self.listBox.pack()
+
+
     def send_button(self, msg):
         self.textCons.config(state=DISABLED)
-
         self.msg = msg
         self.entryMsg.delete(0, END)
         snd = threading.Thread(target=self.send_message)
         snd.start()
 
-    def chat_room(self):
-        pass
-        # self.textCons.config(state=NORMAL)
-        # print(server.Server().return_users())
-        # # self.textCons.insert(END, f"{list(userss.keys())[0]}\n\n")
-        # # self.textCons.insert(END, f"{list(userss.keys())[1]}\n\n")
-        # # self.textCons.insert(END, f"{list(userss.keys())[2]}\n\n")
-        #
-        # self.textCons.config(state=DISABLED)
-        # self.textCons.see(END)
-
     def receive(self):
         while True:
-            message = Client.client_socket.recv(1024).decode('utf-8')
-
+            message = client_socket.recv(1024).decode('utf-8')
             self.textCons.config(state=NORMAL)
-
             self.textCons.insert(END, f"{message}\n\n")
-
+            score = client_socket.recv(1024).decode('utf-8')
+            self.listBox.insert(1, score)
             self.textCons.config(state=DISABLED)
             self.textCons.see(END)
 
     def send_message(self):
         self.textCons.config(state=DISABLED)
-
         message = f"{self.name}:{self.msg}"
-        Client.client_socket.sendall(str.encode(message))
+        client_socket.sendall(str.encode(message))
+        # self.listBox.delete(0, END)
 
 
-c = Client()
-c.start_client()
 gui = GUI()
