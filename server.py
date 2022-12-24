@@ -2,6 +2,7 @@ import json
 import socket
 import threading
 import time
+from datetime import datetime
 
 host = "127.0.0.1"
 port = 8080
@@ -21,11 +22,14 @@ def handle_client(conn, addr):
         data = f'question{i + 1} is: {questions[i]["question"]}\noptions are: {questions[i]["options"]}'
         ans = ''
         conn.sendall(str.encode(data))
-
-        conn.settimeout(15)
+        send_time = datetime.now()
+        conn.settimeout(45)
 
         try:
             ans = conn.recv(1024).decode('utf-8')
+            recv_time = datetime.now()
+            time.sleep(45 - ((recv_time - send_time).total_seconds()))
+            print('time is over!')
 
         except socket.timeout:
             print('time is over!')
