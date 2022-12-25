@@ -1,20 +1,19 @@
 import socket
 import threading
-import time
 from tkinter import *
 import json
-# import server
 
 host = "127.0.0.1"
 port = 8080
 ADDRESS = (host, port)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# scores = server.scores
+
 
 def score_counter(i):
     str = f"sry{i}"
-    i = i+1
+    i = i + 1
     return str
+
 
 with open('./Data/questions.json', 'r', encoding="utf8") as myFile:
     questions = json.load(myFile)
@@ -71,10 +70,8 @@ class GUI:
                          font="Helvetica 14 bold",
                          command=lambda: self.go_ahead(self.entryName.get()))
 
-
         self.go.place(relx=0.4,
                       rely=0.4)
-
 
         self.Window.mainloop()
 
@@ -86,13 +83,14 @@ class GUI:
         threading.Thread(target=self.receive).start()
 
     def layout(self, name):
+        client_socket.sendall(str.encode(name))
         self.name = name
         self.Window.deiconify()
         self.Window.title("Competition")
         self.Window.resizable(width=False,
                               height=False)
 
-        self.Window.configure(width=470,
+        self.Window.configure(width=900,
                               height=550,
                               bg="#092594")
 
@@ -117,13 +115,27 @@ class GUI:
                              height=2,
                              bg="#d3e8c5",
                              fg="#000000",
-                             font="Helvetica 14",
+                             font="Helvetica 10",
                              padx=5,
                              pady=5)
 
         self.textCons.place(relheight=0.745,
-                            relwidth=1,
+                            relwidth=0.4,
                             rely=0.08)
+
+        self.chatBox = Text(self.Window,
+                            width=20,
+                            height=2,
+                            bg="#d3e8c5",
+                            fg="#000000",
+                            font="Helvetica 10",
+                            padx=5,
+                            pady=5)
+
+        self.chatBox.place(relheight=0.745,
+                           relwidth=0.4,
+                           rely=0.08,
+                           relx=0.403)
 
         self.labelBottom = Label(self.Window,
                                  bg="#ABB2B9",
@@ -137,24 +149,46 @@ class GUI:
                               fg="#000000",
                               font="Helvetica 13")
 
-        self.entryMsg.place(relwidth=0.74,
+        self.entryMsg.place(relwidth=0.25,
                             relheight=0.06,
                             rely=0.008,
                             relx=0.011)
+
+        self.entryChat = Entry(self.labelBottom,
+                               bg="#ced6c3",
+                               fg="#000000",
+                               font="Helvetica 13")
+
+        self.entryChat.place(relwidth=0.25,
+                             relheight=0.06,
+                             rely=0.008,
+                             relx=0.4)
 
         self.entryMsg.focus()
 
         self.buttonMsg = Button(self.labelBottom,
                                 text="Send",
                                 font="Helvetica 10 bold",
-                                width=20,
+                                width=10,
                                 bg="#ced6c3",
                                 command=lambda: self.send_button(self.entryMsg.get()))
 
-        self.buttonMsg.place(relx=0.77,
+        self.buttonMsg.place(relx=0.27,
                              rely=0.008,
                              relheight=0.06,
-                             relwidth=0.22)
+                             relwidth=0.12)
+
+        self.chatButton = Button(self.labelBottom,
+                                 text="SendChat",
+                                 font="Helvetica 10 bold",
+                                 width=10,
+                                 bg="#ced6c3",
+                                 command=lambda: self.chat_button(self.entryChat.get()))
+
+        self.chatButton.place(relx=0.67,
+                              rely=0.008,
+                              relheight=0.06,
+                              relwidth=0.12)
 
         self.textCons.config(cursor="heart")
 
@@ -165,18 +199,16 @@ class GUI:
 
         scrollbar.config(command=self.textCons.yview)
 
-        self.textCons.config(state=DISABLED)
+        self.listBox = Listbox(self.Window)
 
-        self.listBox = Listbox()
-
-        self.listBox.place(relwidth=0.4,
-                           relheight=0.12,
-                           relx=0.35,
-                           rely=0.2)
-
+        self.listBox.place(relwidth=0.18,
+                           relheight=0.745,
+                           relx=0.81,
+                           rely=0.08)
 
         # self.listBox.pack()
 
+        self.textCons.config(state=DISABLED)
 
     def send_button(self, msg):
         self.textCons.config(state=DISABLED)
@@ -185,19 +217,41 @@ class GUI:
         snd = threading.Thread(target=self.send_message)
         snd.start()
 
+    def chat_button(self, chat):
+
+        self.chat = chat
+        self.entryChat.delete(0, END)
+        snd = threading.Thread(target=self.send_chat)
+        snd.start()
+
     def receive(self):
         while True:
             message = client_socket.recv(1024).decode('utf-8')
-            self.textCons.config(state=NORMAL)
-            self.textCons.insert(END, f"{message}\n\n")
-            score = client_socket.recv(1024).decode('utf-8')
-            self.listBox.insert(1, score)
-            self.textCons.config(state=DISABLED)
-            self.textCons.see(END)
+
+            if message.find('{') != -1:
+                self.listBox.insert(1, message)
+
+            elif message.find('question') != -1:
+                self.textCons.config(state=NORMAL)
+                self.textCons.insert(END, f"{message}\n\n")
+                self.textCons.config(state=DISABLED)
+                self.textCons.see(END)
+
+            else:
+                self.chatBox.config(state=NORMAL)
+                self.chatBox.insert(END, f"{message}\n\n")
+                self.chatBox.config(state=DISABLED)
+                self.chatBox.see(END)
 
     def send_message(self):
         self.textCons.config(state=DISABLED)
         message = f"{self.name}:{self.msg}"
+        client_socket.sendall(str.encode(message))
+        # self.listBox.delete(0, END)
+
+    def send_chat(self):
+        self.textCons.config(state=DISABLED)
+        message = self.chat
         client_socket.sendall(str.encode(message))
         # self.listBox.delete(0, END)
 
