@@ -23,7 +23,7 @@ def handle_client(conn, addr):
         data = f'question{i + 1} is: {questions[i]["question"]}\noptions are: {questions[i]["options"]}'
         ans = ''
 
-        conn.sendall(str.encode(data))
+        conn.sendall(str.encode(f'{data}--usernames:{str(list((users.keys())))}'))
         send_time = datetime.now()
         conn.settimeout(35)
 
@@ -49,7 +49,7 @@ def handle_client(conn, addr):
 
         print('chat room started...')
         time1 = datetime.now()
-        conn.settimeout(25)
+        conn.settimeout(5)
 
         try:
             message = conn.recv(1024).decode('utf-8')
@@ -65,7 +65,7 @@ def handle_client(conn, addr):
                 dest_conn = users[dest_user][0]
                 dest_conn.sendall(str.encode(f'{source_user}: {chat}'))
 
-            time.sleep(25 - ((time2 - time1).total_seconds()))
+            time.sleep(5 - ((time2 - time1).total_seconds()))
             print('time for chat is over!')
 
         except socket.timeout:

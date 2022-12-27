@@ -204,9 +204,13 @@ class GUI:
         self.listBox = Listbox(self.Window)
 
         self.listBox.place(relwidth=0.18,
-                           relheight=0.745,
+                           relheight=0.345,
                            relx=0.81,
                            rely=0.08)
+
+        self.userNameBox = Listbox(self.Window,relief=RAISED)
+
+        self.userNameBox.place(x=730, y=245, relwidth=0.18, relheight=0.36)
 
         # self.listBox.pack()
 
@@ -252,9 +256,11 @@ class GUI:
         while True:
             message = client_socket.recv(1024).decode('utf-8')
 
-            # second = StringVar()
-            # second.set("5")
-
+            if message.split("--")[-1].startswith("usernames:"):
+                user_names = message.split("--")[1]
+                # user_names.replace("usernames:", "")
+                message = message.split("--")[0]
+                self.userNameBox.insert(0,user_names)
 
             def submit(second):
                 try:
@@ -270,18 +276,17 @@ class GUI:
                     #     messagebox.showinfo("Time Countdown", "Time's up ")
                     temp -= 1
 
-
             if message.find('{') != -1:
                 self.listBox.insert(1, message)
-
                 second = StringVar()
                 second.set("5")
                 self.secondEntry = Message(textvariable=second, relief=RAISED)
-                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1, )
                 self.btn = Message(bd='5', command=submit(second))
 
 
             elif message.find('question') != -1:
+                self.listBox.delete(0, END)
                 self.textCons.config(state=NORMAL)
                 self.textCons.insert(END, f"{message}\n\n")
                 self.textCons.config(state=DISABLED)
@@ -289,7 +294,7 @@ class GUI:
                 second1 = StringVar()
                 second1.set("10")
                 self.secondEntry = Message(textvariable=second1, relief=RAISED)
-                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1, )
                 self.btn = Message(bd='5', command=submit(second1))
 
 
@@ -301,14 +306,15 @@ class GUI:
                 second2 = StringVar()
                 second2.set("15")
                 self.secondEntry = Message(textvariable=second2, relief=RAISED)
-                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1, )
                 self.btn = Message(bd='5', command=submit(second2))
+
+
 
     def send_message(self):
         self.textCons.config(state=DISABLED)
         message = f"{self.name}:{self.msg}"
         client_socket.sendall(str.encode(message))
-        # self.listBox.delete(0, END)
 
     def send_chat(self):
         self.textCons.config(state=DISABLED)
