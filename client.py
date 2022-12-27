@@ -2,6 +2,8 @@ import socket
 import threading
 from tkinter import *
 import json
+import time
+from tkinter import messagebox
 
 host = "127.0.0.1"
 port = 8080
@@ -210,6 +212,28 @@ class GUI:
 
         self.textCons.config(state=DISABLED)
 
+        # second = StringVar()
+        # second.set("5")
+        #
+        # self.secondEntry = Message(textvariable=second, relief=RAISED)
+        # self.secondEntry.place(x=180, y=20)
+        #
+        # def submit():
+        #     try:
+        #         temp = int(second.get())
+        #     except:
+        #         print("Please input the right value")
+        #     while temp > -1:
+        #         mins, secs = divmod(temp, 60)
+        #         second.set("{0:2d}".format(secs))
+        #         self.secondEntry.update()
+        #         time.sleep(1)
+        #         if (temp == 0):
+        #             messagebox.showinfo("Time Countdown", "Time's up ")
+        #         temp -= 1
+        #
+        # self.btn = Message(bd='5', command=submit())
+
     def send_button(self, msg):
         self.textCons.config(state=DISABLED)
         self.msg = msg
@@ -228,20 +252,57 @@ class GUI:
         while True:
             message = client_socket.recv(1024).decode('utf-8')
 
+            # second = StringVar()
+            # second.set("5")
+
+
+            def submit(second):
+                try:
+                    temp = int(second.get())
+                except:
+                    print("Please input the right value")
+                while temp > -1:
+                    mins, secs = divmod(temp, 60)
+                    second.set("{0:2d}".format(secs))
+                    self.secondEntry.update()
+                    time.sleep(1)
+                    # if (temp == 0):
+                    #     messagebox.showinfo("Time Countdown", "Time's up ")
+                    temp -= 1
+
+
             if message.find('{') != -1:
                 self.listBox.insert(1, message)
+
+                second = StringVar()
+                second.set("5")
+                self.secondEntry = Message(textvariable=second, relief=RAISED)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.btn = Message(bd='5', command=submit(second))
+
 
             elif message.find('question') != -1:
                 self.textCons.config(state=NORMAL)
                 self.textCons.insert(END, f"{message}\n\n")
                 self.textCons.config(state=DISABLED)
                 self.textCons.see(END)
+                second1 = StringVar()
+                second1.set("10")
+                self.secondEntry = Message(textvariable=second1, relief=RAISED)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.btn = Message(bd='5', command=submit(second1))
+
 
             else:
                 self.chatBox.config(state=NORMAL)
                 self.chatBox.insert(END, f"{message}\n\n")
                 self.chatBox.config(state=DISABLED)
                 self.chatBox.see(END)
+                second2 = StringVar()
+                second2.set("15")
+                self.secondEntry = Message(textvariable=second2, relief=RAISED)
+                self.secondEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1,)
+                self.btn = Message(bd='5', command=submit(second2))
 
     def send_message(self):
         self.textCons.config(state=DISABLED)
