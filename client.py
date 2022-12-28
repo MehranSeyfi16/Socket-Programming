@@ -4,9 +4,19 @@ from tkinter import *
 import json
 import time
 from tkinter import messagebox
+with open('./Data/users.json', 'r', encoding="utf8") as myFile:
+    users = json.load(myFile)
+
+if len(users) != 1:
+    del users[0]
+
+with open('./Data/users.json', 'w') as myFile:
+    json.dump(users, myFile)
+
 
 host = "127.0.0.1"
-port = 8080
+port = users[0]["port"]
+print(port)
 ADDRESS = (host, port)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

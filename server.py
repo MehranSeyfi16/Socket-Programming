@@ -4,8 +4,12 @@ import threading
 import time
 from datetime import datetime
 
+with open('./Data/users.json', 'r', encoding="utf8") as myFile:
+    users = json.load(myFile)
+
 host = "127.0.0.1"
-port = 8080
+port = users[0]["port"]
+print(port)
 clientCount = 0
 CLIENTS = []
 scores = {}
