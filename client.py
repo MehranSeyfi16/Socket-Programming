@@ -31,6 +31,8 @@ class GUI:
     def __init__(self):
 
         self.timerEntry = None
+        self.answerFlag = False
+        self.chatFlag = False
         self.chat = None
         self.answer = None
         self.userNameBox = None
@@ -215,12 +217,14 @@ class GUI:
             elif temp == 0 and timer_value == 5:
                 self.userNameBox.delete(1, END)
                 self.userNameBox.insert(1, "Now you can chat with others.")
+                self.chatFlag = True
                 temp = 21
                 timer_value = 21
 
             elif temp == 0 and timer_value == 21:
                 self.userNameBox.delete(1, END)
                 self.userNameBox.insert(1, "Time for chat is up!")
+                self.chatFlag = False
                 temp = 6
                 timer_value = 0
 
@@ -237,6 +241,7 @@ class GUI:
 
             # question
             if message.find('question') != -1:
+                self.answerFlag = True
                 self.scoreBox.delete(0, END)
                 self.questionBox.config(state=NORMAL)
                 self.questionBox.insert(END, f"{message}\n\n")
@@ -251,7 +256,7 @@ class GUI:
 
             # scoreboard
             elif message.find('scores') != -1:
-
+                self.answerFlag = False
                 scores = message.split('@')[1].lstrip('{').rstrip('}').split(',')
                 for score in scores:
                     self.scoreBox.insert(END, score)
@@ -278,10 +283,12 @@ class GUI:
 
     def send_message(self):
         message = f"{self.name}:{self.answer}"
-        client_socket.sendall(str.encode(message))
+        if self.answerFlag:
+            client_socket.sendall(str.encode(message))
 
     def send_chat(self):
-        client_socket.sendall(str.encode(self.chat))
+        if self.chatFlag:
+            client_socket.sendall(str.encode(self.chat))
 
 
 gui = GUI()
