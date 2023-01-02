@@ -50,6 +50,7 @@ def handle_client(conn, addr):
         ans = ''
         conn.sendall(str.encode(data))
         send_time = datetime.now()
+
         conn.settimeout(31.5)
 
         try:
@@ -67,6 +68,9 @@ def handle_client(conn, addr):
 
             if int(user_answer) == questions[i]["answer"]:
                 scores[user_name] += 1
+
+        temp_time = datetime.now().time().microsecond
+        time.sleep((1000000 - temp_time) / 1000000)
 
         conn.sendall(str.encode(f'scores@{str(scores)}'))
         time.sleep(6.2)
