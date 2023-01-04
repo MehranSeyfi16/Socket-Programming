@@ -63,10 +63,10 @@ class GUI:
         sys.exit()
 
     def guide(self):
-        self.guideWindow = Toplevel(self.root, background='#BCB341')
+        self.guideWindow = Toplevel(self.root, background='#32a1a1')
         self.guideWindow.title("Guide")
-        self.guideWindow.geometry("300x300")
-        msg = Label(self.guideWindow, background='#BCB341', text=f'rules')
+        self.guideWindow.geometry("400x160")
+        msg = Label(self.guideWindow, background='#41bcbc', text=f'Competition rules:\n First of all, the first question will be sent to you,\n   and you have 45 seconds to answer that,\n     meanwhile, only the first answer you sent will be considered\n     and no points will be given to the subsequent answers.\n    Then the scoreboard will be displayed in 5 seconds,\n    after that, time is included for you to chat, and you can send a message \n     to the desired user with the syntax chat#username. After the chat time ends, \n     the next question is sent and the same process continues.\n')
         msg.pack()
 
 
