@@ -32,23 +32,23 @@ class GUI:
         self.label1 = Label(self.root, image=self.bg)
         self.label1.place(x=0, y=0)
 
-        self.startButton = Button(self.root, text="New Game", background='#00F321', font='Chiller 30 bold',
+        self.startButton = Button(self.root, text="New Game", background='#DB1F48',foreground='white', font=("showcard gothic", 16, "bold"),
                                   command=self.start_game)
-        self.startButton.place(x=330,
+        self.startButton.place(x=50,
                                y=400,
                                width=130,
                                height=100)
 
-        self.guideButton = Button(self.root, text="Guide", background='#FFB900', font='Chiller 30 bold',
+        self.guideButton = Button(self.root, text="Guide", background='#DB1F48',foreground='white', font=("showcard gothic", 16, "bold"),
                                   command=self.guide)
         self.guideButton.place(x=190,
                                y=400,
                                width=130,
                                height=100)
 
-        self.exitButton = Button(self.root, text="Exit", background='#FF0000', font='Chiller 30 bold',
+        self.exitButton = Button(self.root, text="Exit", background='#DB1F48',foreground='white', font=("showcard gothic", 16, "bold"),
                                  command=self.exit)
-        self.exitButton.place(x=50,
+        self.exitButton.place(x=330,
                               y=400,
                               width=130,
                               height=100)

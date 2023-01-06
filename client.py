@@ -60,20 +60,20 @@ class GUI:
 
         self.root.configure(width=900,
                             height=550,
-                            bg="#AD5858")
+                            bg="#991532")
 
         self.labelHead = Label(self.root,
-                               bg="#AD5858",
-                               fg="#000000",
+                               bg="#991532",
+                               fg="#FEC84D",
                                text=self.name,
-                               font="Ebrima 20 bold",
+                               font=("showcard gothic", 16, "bold"),
                                pady=5)
 
         self.labelHead.place(relwidth=1)
 
         self.line = Label(self.root,
                           width=450,
-                          bg="#AD5858")
+                          bg="#991532")
 
         self.line.place(relwidth=1,
                         rely=0.07,
@@ -82,7 +82,7 @@ class GUI:
         self.questionBox = Text(self.root,
                                 width=20,
                                 height=2,
-                                bg="#C4D1DE",
+                                bg="#F2F1E8",
                                 fg="#000000",
                                 font="Helvetica 12",
                                 padx=5,
@@ -98,7 +98,7 @@ class GUI:
         self.chatBox = Text(self.root,
                             width=20,
                             height=2,
-                            bg="#C4D1DE",
+                            bg="#F2F1E8",
                             fg="#000000",
                             font="Helvetica 15",
                             padx=5,
@@ -112,14 +112,14 @@ class GUI:
         self.chatBox.config(state=DISABLED)
 
         self.labelBottom = Label(self.root,
-                                 bg="#AD5858",
+                                 bg="#991532",
                                  height=80)
 
         self.labelBottom.place(relwidth=1,
                                rely=0.825)
 
         self.entryAnswer = Entry(self.labelBottom,
-                                 bg="#C4D1DE",
+                                 bg="#F2F1E8",
                                  fg="#000000",
                                  font="Helvetica 13")
 
@@ -131,7 +131,7 @@ class GUI:
         self.entryAnswer.focus()
 
         self.entryChat = Entry(self.labelBottom,
-                               bg="#C4D1DE",
+                               bg="#F2F1E8",
                                fg="#000000",
                                font="Helvetica 13")
 
@@ -142,9 +142,10 @@ class GUI:
 
         self.answerButton = Button(self.labelBottom,
                                    text="Send",
-                                   font="Helvetica 10 bold",
+                                   font=("showcard gothic", 16, "bold"),
                                    width=10,
-                                   bg="#C4D1DE",
+                                   bg="#FEC84D",
+                                   fg="#004369",
                                    command=lambda: self.send_button(self.entryAnswer.get()))
 
         self.answerButton.place(relx=0.27,
@@ -153,10 +154,11 @@ class GUI:
                                 relwidth=0.12)
 
         self.chatButton = Button(self.labelBottom,
-                                 text="SendChat",
-                                 font="Helvetica 10 bold",
+                                 text="Chat",
+                                 font=("showcard gothic", 16, "bold"),
                                  width=10,
-                                 bg="#C4D1DE",
+                                 bg="#FEC84D",
+                                 fg="#004369",
                                  command=lambda: self.chat_button(self.entryChat.get()))
 
         self.chatButton.place(relx=0.68,
@@ -171,14 +173,14 @@ class GUI:
 
         scrollbar.config(command=self.questionBox.yview)
 
-        self.scoreBox = Listbox(self.root, background='#C4D1DE', font='Helvetica 10 bold')
+        self.scoreBox = Listbox(self.root, background='#F2F1E8', font='Helvetica 10 bold')
 
         self.scoreBox.place(relwidth=0.18,
                             relheight=0.345,
                             relx=0.81,
                             rely=0.08)
 
-        self.userNameBox = Listbox(self.root, relief=RAISED, background='#C4D1DE')
+        self.userNameBox = Listbox(self.root, relief=RAISED, background='#F2F1E8')
         self.userNameBox.place(x=730, y=245, relwidth=0.18, relheight=0.38)
         self.userNameBox.insert(0, str(names[1:]))
 
@@ -241,16 +243,30 @@ class GUI:
 
             # question
             if message.find('question') != -1:
+
+                question = message.split('\n')[0]
+                options = (message.split('\n')[1]).split(',')
+                option1 = options[0].lstrip('[')
+                option2 = options[1]
+                option3 = options[2]
+                option4 = options[3].rstrip(']')
+
+
+
                 self.answerFlag = True
                 self.scoreBox.delete(0, END)
                 self.questionBox.config(state=NORMAL)
-                self.questionBox.insert(END, f"{message}\n\n")
+                self.questionBox.insert(END, f"{question}\n\n")
+                self.questionBox.insert(END, f"1){option1}\n\n")
+                self.questionBox.insert(END, f"2){option2}\n\n")
+                self.questionBox.insert(END, f"3){option3}\n\n")
+                self.questionBox.insert(END, f"4){option4}\n\n")
                 self.questionBox.config(state=DISABLED)
                 self.questionBox.see(END)
                 second1 = StringVar()
                 second1.set("30")
-                self.timerEntry = Message(textvariable=second1, relief=RAISED, background='#C4D1DE',
-                                          font='Helvetica 15 bold')
+                self.timerEntry = Message(textvariable=second1, relief=RAISED, background='#004369',foreground="white",
+                                          font=("showcard gothic", 16, "bold"))
                 self.timerEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1)
                 threading.Thread(target=self.submit, args=(second1,)).start()
 
@@ -263,8 +279,8 @@ class GUI:
 
                 second = StringVar()
                 second.set("5")
-                self.timerEntry = Message(textvariable=second, relief=RAISED, background='#C4D1DE',
-                                          font='Helvetica 15 bold')
+                self.timerEntry = Message(textvariable=second, relief=RAISED, background='#004369', foreground="white",
+                                          font=("showcard gothic", 16, "bold"))
                 self.timerEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1)
                 threading.Thread(target=self.submit, args=(second,)).start()
 
