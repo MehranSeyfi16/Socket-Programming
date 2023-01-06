@@ -285,10 +285,12 @@ class GUI:
         message = f"{self.name}:{self.answer}"
         if self.answerFlag:
             client_socket.sendall(str.encode(message))
+            self.answerFlag = False
 
     def send_chat(self):
         if self.chatFlag:
             client_socket.sendall(str.encode(self.chat))
+            self.chatFlag = False
 
 
 gui = GUI()

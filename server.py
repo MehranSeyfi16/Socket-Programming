@@ -31,12 +31,12 @@ def chatroom(connection, address, users):
         message = connection.recv(1024).decode('utf-8')
 
         if message != '':
-            chat = message.split('#')[0]
+            chat = message.split('>')[0]
             key_list = list(users.keys())
             val_list = list(users.values())
             position = val_list.index((connection, address))
             source_user = key_list[position]
-            dest_user = message.split('#')[1]
+            dest_user = message.split('>')[1]
             dest_conn = users[dest_user][0]
             dest_conn.sendall(str.encode(f'{source_user}: {chat}'))
 

@@ -57,7 +57,7 @@ class GUI:
 
     def start_game(self):
         self.root.destroy()
-        os.system(f'python server.py {len(users) - 1} 8081 8082 8083')
+        os.system(f'python server.py {len(users) - 1}')
 
     def exit(self):
         sys.exit()
