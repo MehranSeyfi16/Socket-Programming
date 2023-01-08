@@ -1,3 +1,4 @@
+import re
 import socket
 import sys
 import threading
@@ -84,7 +85,7 @@ class GUI:
                                 height=2,
                                 bg="#F2F1E8",
                                 fg="#000000",
-                                font="Helvetica 12",
+                                font=("Farsi Kamran Bold", 15, "bold"),
                                 padx=5,
                                 pady=5)
 
@@ -100,7 +101,7 @@ class GUI:
                             height=2,
                             bg="#F2F1E8",
                             fg="#000000",
-                            font="Helvetica 15",
+                            font=("Comic Sans MS", 15),
                             padx=5,
                             pady=5)
 
@@ -121,7 +122,7 @@ class GUI:
         self.entryAnswer = Entry(self.labelBottom,
                                  bg="#F2F1E8",
                                  fg="#000000",
-                                 font="Helvetica 13")
+                                 font=("Comic Sans MS", 20))
 
         self.entryAnswer.place(relwidth=0.25,
                                relheight=0.06,
@@ -133,7 +134,7 @@ class GUI:
         self.entryChat = Entry(self.labelBottom,
                                bg="#F2F1E8",
                                fg="#000000",
-                               font="Helvetica 13")
+                               font=("Comic Sans MS", 15))
 
         self.entryChat.place(relwidth=0.25,
                              relheight=0.06,
@@ -173,16 +174,18 @@ class GUI:
 
         scrollbar.config(command=self.questionBox.yview)
 
-        self.scoreBox = Listbox(self.root, background='#F2F1E8', font='Helvetica 10 bold')
+        self.scoreBox = Listbox(self.root, background='#F2F1E8', font=("Comic Sans MS", 12))
 
         self.scoreBox.place(relwidth=0.18,
                             relheight=0.345,
                             relx=0.81,
                             rely=0.08)
 
-        self.userNameBox = Listbox(self.root, relief=RAISED, background='#F2F1E8')
+        self.userNameBox = Listbox(self.root, relief=RAISED, background='#F2F1E8', font=("Comic Sans MS", 12))
         self.userNameBox.place(x=730, y=245, relwidth=0.18, relheight=0.38)
-        self.userNameBox.insert(0, str(names[1:]))
+        self.userNameBox.insert(END, "users:\n")
+        for i in range(1, len(names)):
+            self.userNameBox.insert(END, names[i])
 
         threading.Thread(target=self.receive).start()
         self.root.mainloop()
@@ -212,27 +215,26 @@ class GUI:
             time.sleep(1)
 
             if temp == 0 and timer_value == 30:
-                self.userNameBox.delete(1, END)
-                self.userNameBox.insert(1, "Time is up!")
+                self.userNameBox.insert(END, "Time is up!")
                 break
 
             elif temp == 0 and timer_value == 5:
-                self.userNameBox.delete(1, END)
-                self.userNameBox.insert(1, "Now you can chat with others.")
+                self.userNameBox.delete(END)
+                self.userNameBox.insert(END, "Now you can chat.")
                 self.chatFlag = True
                 temp = 21
                 timer_value = 21
 
             elif temp == 0 and timer_value == 21:
-                self.userNameBox.delete(1, END)
-                self.userNameBox.insert(1, "Time for chat is up!")
+                self.userNameBox.delete(END)
+                self.userNameBox.insert(END, "Time for chat is up!")
                 self.chatFlag = False
                 temp = 6
                 timer_value = 0
 
             elif temp == 0 and timer_value == 0:
-                self.userNameBox.delete(1, END)
-                self.userNameBox.insert(1, 'next question...')
+                self.userNameBox.delete(END)
+
                 break
 
             temp -= 1
@@ -243,21 +245,22 @@ class GUI:
 
             # question
             if message.find('question') != -1:
-
-                question = message.split('\n')[0]
+                self.questionBox.config(state=NORMAL)
+                self.questionBox.delete("1.0", END)
+                question = message.split('\n')[0].lstrip('question')
+                question = re.sub(r'[0-9]', '', question)
+                question = question.lstrip(':')
                 options = (message.split('\n')[1]).split(',')
-                option1 = options[0].lstrip('[')
-                option2 = options[1]
-                option3 = options[2]
-                option4 = options[3].rstrip(']')
-
-
+                option1 = options[0].lstrip('[').replace("'", '')
+                option2 = options[1].replace("'", '')
+                option3 = options[2].replace("'", '')
+                option4 = options[3].rstrip(']').replace("'", '')
 
                 self.answerFlag = True
                 self.scoreBox.delete(0, END)
-                self.questionBox.config(state=NORMAL)
+
                 self.questionBox.insert(END, f"{question}\n\n")
-                self.questionBox.insert(END, f"1){option1}\n\n")
+                self.questionBox.insert(END, f"1) {option1}\n\n")
                 self.questionBox.insert(END, f"2){option2}\n\n")
                 self.questionBox.insert(END, f"3){option3}\n\n")
                 self.questionBox.insert(END, f"4){option4}\n\n")
@@ -275,7 +278,7 @@ class GUI:
                 self.answerFlag = False
                 scores = message.split('@')[1].lstrip('{').rstrip('}').split(',')
                 for score in scores:
-                    self.scoreBox.insert(END, score)
+                    self.scoreBox.insert(END, score.replace("'", ''))
 
                 second = StringVar()
                 second.set("5")
