@@ -3,7 +3,7 @@ import sys
 import os
 from tkinter import *
 
-with open('./Data/users.json', 'r', encoding="utf8") as myFile:
+with open('../Data/users.json', 'r', encoding="utf8") as myFile:
     users = json.load(myFile)
 
 
@@ -27,7 +27,7 @@ class GUI:
         self.root.configure(width=512,
                             height=512)
 
-        self.bg = PhotoImage(file="pic.png")
+        self.bg = PhotoImage(file="../Data/pic.png")
 
         self.label1 = Label(self.root, image=self.bg)
         self.label1.place(x=0, y=0)
