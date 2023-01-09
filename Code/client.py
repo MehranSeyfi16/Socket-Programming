@@ -9,23 +9,33 @@ import time
 with open('../Data/users.json', 'r', encoding="utf8") as myFile:
     users = json.load(myFile)
 
-names = []
 
-for user in users:
-    names.append(user['name'])
 
-host = "127.0.0.1"
-port = users[int(sys.argv[1])]["port"]
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.bind((host, port))
 
-try:
-    client_socket.connect((host, users[0]["port"]))
-except socket.error as e:
-    print(str(e))
 
-print(f"[CONNECTED] Client connected to server at {host}:{port}")
+class Client:
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    names = []
+
+    def __init__(self):
+        self.ip = "127.0.0.1"
+        self.port = users[int(sys.argv[1])]["port"]
+
+        for user in users:
+            Client.names.append(user['name'])
+
+    def start_client(self):
+
+        Client.client_socket.bind((self.ip, self.port))
+
+        try:
+            Client.client_socket.connect((self.ip, users[0]["port"]))
+        except socket.error as e:
+            print(str(e))
+
+        print(f"[CONNECTED] Client connected to server at {self.ip}:{self.port}")
 
 
 class GUI:
@@ -47,11 +57,11 @@ class GUI:
         self.questionBox = None
         self.line = None
         self.labelHead = None
-        self.name = names[int(sys.argv[1])]
+        self.name = Client.names[int(sys.argv[1])]
         self.root = None
 
     def root_window(self):
-        client_socket.sendall(str.encode(self.name))
+        Client.client_socket.sendall(str.encode(self.name))
         self.root = Tk()
         self.root.withdraw()
         self.root.deiconify()
@@ -184,8 +194,8 @@ class GUI:
         self.userNameBox = Listbox(self.root, relief=RAISED, background='#F2F1E8', font=("Comic Sans MS", 12))
         self.userNameBox.place(x=730, y=245, relwidth=0.18, relheight=0.38)
         self.userNameBox.insert(END, "users:\n")
-        for i in range(1, len(names)):
-            self.userNameBox.insert(END, names[i])
+        for i in range(1, len(Client.names)):
+            self.userNameBox.insert(END, Client.names[i])
 
         threading.Thread(target=self.receive).start()
         self.root.mainloop()
@@ -241,7 +251,7 @@ class GUI:
 
     def receive(self):
         while True:
-            message = client_socket.recv(1024).decode('utf-8')
+            message = Client.client_socket.recv(1024).decode('utf-8')
 
             # question
             if message.find('question') != -1:
@@ -268,7 +278,7 @@ class GUI:
                 self.questionBox.see(END)
                 second1 = StringVar()
                 second1.set("45")
-                self.timerEntry = Message(textvariable=second1, relief=RAISED, background='#004369',foreground="white",
+                self.timerEntry = Message(textvariable=second1, relief=RAISED, background='#004369', foreground="white",
                                           font=("showcard gothic", 16, "bold"))
                 self.timerEntry.place(x=770, y=475, relwidth=0.1, relheight=0.1)
                 threading.Thread(target=self.submit, args=(second1,)).start()
@@ -297,19 +307,21 @@ class GUI:
                 self.chatBox.config(state=DISABLED)
                 self.chatBox.see(END)
 
-        client_socket.close()
+        Client.client_socket.close()
         self.root.destroy()
 
     def send_message(self):
         message = f"{self.name}:{self.answer}"
         if self.answerFlag:
-            client_socket.sendall(str.encode(message))
+            Client.client_socket.sendall(str.encode(message))
             self.answerFlag = False
 
     def send_chat(self):
         if self.chatFlag:
-            client_socket.sendall(str.encode(self.chat))
+            Client.client_socket.sendall(str.encode(self.chat))
 
 
+c = Client()
+c.start_client()
 gui = GUI()
 gui.root_window()
